@@ -1,10 +1,8 @@
 import pickle
 import os
-from . import dmusic_functions, dmusic_class
-import plotting_styles as ps
+from . import dmusic_functions
 import matplotlib.pyplot as plt
 from tkinter.filedialog import askopenfilename, askopenfilenames
-import h5py
 
 
 def show_dmusic(file=None, savefile=None):
@@ -14,10 +12,9 @@ def show_dmusic(file=None, savefile=None):
     shot = int(os.path.basename(file).split("_")[1])
     print([i.shape for i in out])
 
-    with ps.rc_context(ps.pub_style_one_cantarell):
-        fig, ax = plt.subplots(1, 1, figsize=[6, 3])
-        fig, ax = dmusic_functions.plot_dmusic_sgram(*out, figax=(fig, ax))
-        ax.set(xlabel="T [ms]", ylabel="Freq [kHz]", title=f"#{shot}")
+    fig, ax = plt.subplots(1, 1, figsize=[6, 3])
+    fig, ax = dmusic_functions.plot_dmusic_sgram(*out, figax=(fig, ax))
+    ax.set(xlabel="T [ms]", ylabel="Freq [kHz]", title=f"#{shot}")
     # plt.show()
     if savefile is not None:
         fig.savefig(savefile, dpi=600)
