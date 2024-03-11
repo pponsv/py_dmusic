@@ -9,7 +9,16 @@ from tkinter.filedialog import askopenfilename
 
 class DMusic:
     def __init__(
-        self, t, y, poverlap, N, J, K, mesh_size=(30, 500), rlim=(0, -1), flim=None
+        self,
+        t,
+        y,
+        poverlap,
+        N,
+        J,
+        K,
+        mesh_size=(30, 500),
+        rlim=(0, -1),
+        flim=None,
     ):
         self.t = t
         self.y = y
@@ -33,11 +42,14 @@ class DMusic:
         if self.flim is None:
             self.fs = np.linspace(0, self.freq_nyq, self.mesh_size[1])
         else:
-            self.fs = np.linspace(self.flim[0], self.flim[1], self.mesh_size[1])
+            self.fs = np.linspace(
+                self.flim[0], self.flim[1], self.mesh_size[1]
+            )
         self.rs = np.linspace(self.rlim[0], self.rlim[1], self.mesh_size[0])
         self.k0 = np.arange(0, len(self.y) - self.N, self.N - self.overlap)
         self.ts = (
-            np.array([self.t[i] for i in self.k0]) + self.overlap * self.delta_t / 2
+            np.array([self.t[i] for i in self.k0])
+            + self.overlap * self.delta_t / 2
         )
 
     def make_rmat(self):
@@ -46,7 +58,9 @@ class DMusic:
         for i_w in range(len(ws)):
             for i_r in range(len(self.rs)):
                 r = np.exp(
-                    np.arange(self.J) * self.delta_t * (self.rs[i_r] + 1j * ws[i_w])
+                    np.arange(self.J)
+                    * self.delta_t
+                    * (self.rs[i_r] + 1j * ws[i_w])
                 )
                 norm_r = np.linalg.norm(r)
                 rmat[:, len(self.rs) * i_w + i_r] = r / norm_r
@@ -97,12 +111,20 @@ class DMusic:
             fig, ax = self.plot_dmusic_sgram(ax)
         return fig, ax
 
-    def save_dmusic(self, shot: int, savefile: str | None = None):
+    def save_dmusic(
+        self,
+        shot: int,
+        savefile: str | None = None,
+        savedir: str | None = None,
+    ):
         """Save the DMUSIC result to an HDF5 file."""
+        if savedir is None:
+            savedir = "./dmusics/hdfs"
         if savefile is None:
-            savefile = f"./dmusics/hdfs/dmusic__{shot}__{self.t[0]:.2f}_{self.t[-1]:.2f}__{self.fs[0]:.2f}_{self.fs[-1]:.2f}.h5"
-        os.makedirs(os.path.dirname(savefile), exist_ok=True)
-        with h5py.File(savefile, "w") as f:
+            savefile = f"dmusic__{shot}__{self.t[0]:.2f}_{self.t[-1]:.2f}__{self.fs[0]:.2f}_{self.fs[-1]:.2f}.h5"
+        filename = f"{savedir}/{savefile}"
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        with h5py.File(filename, "w") as f:
             # Save original arrays
             f.create_dataset("t", data=self.t)
             f.create_dataset("y", data=self.y)
@@ -142,7 +164,9 @@ class DMusic:
             rlim = params_group["rlim"][:]  # type: ignore
             flim = params_group["flim"][:]  # type: ignore
         #   Create DMUSIC object
-        out = DMusic(t=t, y=y, N=N, J=J, K=K, poverlap=poverlap, rlim=rlim, flim=flim)
+        out = DMusic(
+            t=t, y=y, N=N, J=J, K=K, poverlap=poverlap, rlim=rlim, flim=flim
+        )
         out.ps = ps
         out.fs = fs
         out.ts = ts
